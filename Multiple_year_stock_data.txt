@@ -1,0 +1,158 @@
+Sub StockInfo():
+
+Dim TotalVolume As Double
+Dim Ticker As String
+Dim SummaryTable As String
+Dim PercentChange As Double
+Dim BeginningP As Double
+Dim EndingP As Double
+Dim Lastrow As String
+Dim Counter As Double
+
+'Fint the last row in the worksheet
+Lastrow = Cells(Rows.Count, 1).End(xlUp).Row
+
+'Set the increments at which you write the summary stock information
+SummaryTable = 2
+
+Range("I1").Value = "Ticker"
+Range("J1").Value = "Yearly Change"
+Range("K1").Value = "Percent Change"
+Range("L1").Value = "Total Stock Volume"
+
+'Set a BeginningP value to manage the first record after the headers
+BeginningP = Cells(2, 3).Value
+
+'For loop
+For i = 2 To Lastrow
+    
+    'Captures last record for the ticker as well as the beginning record for the next ticker
+    If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+            
+        'Finds ticker symbol
+        Ticker = Cells(i, 1).Value
+        
+        TotalVolume = TotalVolume + Cells(i, 7).Value
+        
+        'Finds ending price
+        EndingP = Cells(i, 6).Value
+        
+        'Writes Ticker symbol
+        Range("I" & SummaryTable).Value = Ticker
+            
+        'Yearly change
+        Range("J" & SummaryTable).Value = (EndingP - BeginningP)
+        
+            'Formats cells red or green
+            If BeginningP > EndingP Then
+        
+                Range("J" & SummaryTable).Interior.ColorIndex = 3
+            
+            ElseIf BeginningP < EndingP Then
+            
+                Range("J" & SummaryTable).Interior.ColorIndex = 4
+        
+            End If
+                   
+        'Calculates percent change and writes it to worksheet
+        If EndingP = 0 Or BeginningP = 0 Then
+            Range("K" & SummaryTable).Value = 0
+        Else
+            Range("K" & SummaryTable).Value = (EndingP - BeginningP) / BeginningP
+        End If
+        
+        'Writes total volume
+        Range("L" & SummaryTable).Value = TotalVolume
+        
+        'Increments the summary table by 1 each true if statement
+        SummaryTable = SummaryTable + 1
+        
+        'Resets total volume for next ticker symbol
+        TotalVolume = 0
+        
+        'Resets the beginning price after the true if statement
+        BeginningP = Cells(i + 1, 3).Value
+    Else
+        'Keeps a running total of each cell volume until the change in ticker symbol at which point it enters the true if statement and writes the total volume
+        TotalVolume = TotalVolume + Cells(i, 7).Value
+           
+    End If
+    
+Next i
+    
+    'Formats summary table
+    Range("I:L").HorizontalAlignment = xlCenter
+    Range("J:J").NumberFormat = "$#,###.00"
+    Range("K:K").NumberFormat = "0.0%"
+    Range("L:L").NumberFormat = "#,###"
+    ActiveSheet.Columns("I:L").AutoFit
+        
+'Assign Headers for the Max Values
+Range("P1").Value = "Ticker"
+Range("Q1").Value = "Value"
+
+Dim Lastrow2 As String
+Dim GreatInc As Double
+Dim GreatDec As Double
+Dim GreatTotal As Double
+Dim Ticker1 As Integer
+Dim Ticker2 As Integer
+Dim Ticker3 As Integer
+
+GreatInc = Range("K2").Value
+GreatDec = Range("K2").Value
+GreatTotal = Range("L2").Value
+
+'Fint the last row in the Summary
+Lastrow2 = Cells(Rows.Count, 10).End(xlUp).Row
+
+'For loop to see if the first row record is beaten by any other record
+For j = 2 To Lastrow2
+
+    'Greatest Increase
+    If GreatInc < Cells(j + 1, 11).Value Then
+    
+        Ticker1 = j + 1
+        
+        GreatInc = Cells(j + 1, 11).Value
+        
+    End If
+    
+    'Greatest Decrease
+    If GreatDec > Cells(j + 1, 11).Value Then
+    
+        Ticker2 = j + 1
+        
+        GreatDec = Cells(j + 1, 11).Value
+        
+    End If
+
+    'Greatest Total Volume
+    If GreatTotal < Cells(j + 1, 12).Value Then
+    
+        Ticker3 = j + 1
+        
+        GreatTotal = Cells(j + 1, 12).Value
+     
+    End If
+
+Next j
+
+    'Write the information to the worksheet
+    Range("O2").Value = "Greatest % Increase"
+    Range("P2").Value = Cells(Ticker1, 9).Value
+    Range("Q2").Value = GreatInc
+    Range("O3").Value = "Greatest % Decrease"
+    Range("P3").Value = Cells(Ticker2, 9).Value
+    Range("Q3").Value = GreatDec
+    Range("O4").Value = "Greatest Total Volume"
+    Range("P4").Value = Cells(Ticker3, 9).Value
+    Range("Q4").Value = GreatTotal
+        
+    'Format the information
+    Range("O:Q").HorizontalAlignment = xlCenter
+    Range("Q4").NumberFormat = "$#,###.00"
+    Range("Q2:Q3").NumberFormat = "0.0%"
+    ActiveSheet.Columns("O:Q").AutoFit
+        
+End Sub

@@ -1,0 +1,16 @@
+Sub AllWorksheets()
+
+Dim ws As Worksheet
+Dim starting_ws As Worksheet
+Set starting_ws = ActiveSheet
+
+For Each ws In ThisWorkbook.Worksheets
+    ws.Activate
+    
+    Call StockInfo
+    
+Next
+
+starting_ws.Activate
+
+End Sub
